@@ -27,6 +27,8 @@ export default () => {
 
     // Un usuario ha entrado ó ha salido de la sala
     socket.on('usersUpdate', (data) => setConnectedUsers(data.length));
+
+    return () => socket.close();
   }, []);
 
   const sendMessage = () => {
