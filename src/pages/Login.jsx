@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -8,7 +9,9 @@ import {
   Typography,
   TextField,
   CssBaseline,
-  Paper
+  Paper,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import Copyright from '../components/common/Copyright';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -16,6 +19,7 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import api from '../api';
 import { AUTH_REDUCER_LOGIN } from '../utils/constants.utils';
+import { AxiosError } from 'axios';
 
 const formValidationSchema = Yup.object({
   username: Yup.string().required('Nombre de usuario es requerido'),
@@ -25,6 +29,10 @@ const formValidationSchema = Yup.object({
 export default function SignInSide () {
   const authState = useAuth();
   const navigator = useNavigate();
+  const [snackbarError, setSnackbarError] = useState({
+    open: false,
+    message: ''
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -44,10 +52,22 @@ export default function SignInSide () {
         });
         navigator('/');
       } catch (error) {
-        console.log(error);
+        if (error instanceof AxiosError && error.response) {
+          setSnackbarError({
+            open: true,
+            message: error.response.data.message
+          });
+          return;
+        }
+        setSnackbarError({
+          open: true,
+          message: 'Ha ocurrido un error desconocido'
+        });
       }
     }
   });
+
+  const handleCloseSnackbar = () => setSnackbarError({ open: false, message: '' });
 
   return (
     <Grid container component='main' sx={{ height: '100vh' }}>
@@ -130,6 +150,11 @@ export default function SignInSide () {
           </Box>
         </Box>
       </Grid>
+      <Snackbar open={snackbarError.open} autoHideDuration={2000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity='error' sx={{ width: '100%' }}>
+          {snackbarError.message}
+        </Alert>
+      </Snackbar>
     </Grid>
   );
 }
