@@ -31,7 +31,7 @@ export default () => {
     return () => socket.close();
   }, []);
 
-  const sendMessage = () => {
+  const handleSendMessage = () => {
     if (inputMessage.trim() === '') return;
     socket.emit('message', {
       message: inputMessage,
@@ -40,7 +40,7 @@ export default () => {
     setInputMessage('');
   };
 
-  const logout = () => {
+  const handleLogout = () => {
     auth.dispatch({
       type: AUTH_REDUCER_LOGOUT
     });
@@ -70,7 +70,7 @@ export default () => {
             fullWidth
             color='error'
             endIcon={<LogoutIcon />}
-            onClick={logout}
+            onClick={handleLogout}
           />
         </Grid>
         <Grid item xs={8}>
@@ -86,7 +86,7 @@ export default () => {
           <Button
             fullWidth
             endIcon={<SendIcon />}
-            onClick={sendMessage}
+            onClick={handleSendMessage}
           />
         </Grid>
       </Grid>
